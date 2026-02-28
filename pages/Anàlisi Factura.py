@@ -110,7 +110,11 @@ if uploaded_pdf:
     )
 
     if consum_detectat or data.import_total:
-        st.success("Factura analitzada correctament ✅")
+        st.success("Factura analitzada correctament")
+        if consum_detectat and data.import_total and consum_detectat > 0:
+            preu_efectiu = data.import_total / consum_detectat
+            if preu_efectiu > 0.25:
+                st.warning(f"El teu preu efectiu (~{preu_efectiu:.2f} €/kWh) és elevat. La tarifa PVPC regulada sol ser més barata. Compara al Simulador Solar.")
     else:
         st.warning(
             "Algunes dades no s'han pogut detectar. Revisa el text OCR i introdueix-les manualment al simulador."
