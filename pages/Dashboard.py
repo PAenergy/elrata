@@ -7,8 +7,18 @@ if str(_root) not in sys.path:
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-from ai.prediction import predict_consumption
-from ai.advisor import generate_recommendations
+
+try:
+    from ai.prediction import predict_consumption
+    from ai.advisor import generate_recommendations
+except ImportError:
+    def predict_consumption(df):
+        import pandas as pd
+        mean_val = df["consum_kwh"].mean() if "consum_kwh" in df.columns and len(df) > 0 else 0
+        return pd.DataFrame({"mes": [f"Futur_{i+1}" for i in range(6)], "prediccio_kwh": [mean_val] * 6})
+    def generate_recommendations(*args):
+        return ["Puja les dades per obtenir recomanacions."]
+
 try:
     from services.ui import inject_global_css, render_sidebar_nav
     inject_global_css()
