@@ -99,6 +99,13 @@ html, body, [data-testid="stAppViewContainer"] {
   background: linear-gradient(145deg, #1e3a2f 0%, #0f172a 100%);
 }
 
+.portada-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  cursor: pointer;
+}
+
 .portada-card-titol {
   font-size: 1.25rem;
   font-weight: 700;
@@ -154,11 +161,12 @@ st.markdown("""
 
 st.markdown('<p class="portada-seccio">On vols <span>començar</span>?</p>', unsafe_allow_html=True)
 
-# Targetes
+# Targetes (clicables, enllaços)
 col1, col2, col3 = st.columns(3)
 
 with col1:
     st.markdown("""
+    <a href="/Anàlisi_Factura" class="portada-card-link">
     <div class="portada-card">
       <div class="portada-card-titol">Anàlisi de factura</div>
       <div class="portada-card-desc">
@@ -168,10 +176,12 @@ with col1:
       <span class="portada-chip">OCR</span>
       <span class="portada-chip">Detecció consums</span>
     </div>
+    </a>
     """, unsafe_allow_html=True)
 
 with col2:
     st.markdown("""
+    <a href="/Simulador_Solar" class="portada-card-link">
     <div class="portada-card">
       <div class="portada-card-titol">Simulador de plaques</div>
       <div class="portada-card-desc">
@@ -181,10 +191,12 @@ with col2:
       <span class="portada-chip">ROI</span>
       <span class="portada-chip">Autoconsum</span>
     </div>
+    </a>
     """, unsafe_allow_html=True)
 
 with col3:
     st.markdown("""
+    <a href="/Dashboard" class="portada-card-link">
     <div class="portada-card">
       <div class="portada-card-titol">Dashboard energètic</div>
       <div class="portada-card-desc">
@@ -194,4 +206,5 @@ with col3:
       <span class="portada-chip">Prediccions</span>
       <span class="portada-chip">Indicadors</span>
     </div>
+    </a>
     """, unsafe_allow_html=True)
