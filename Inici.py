@@ -144,6 +144,7 @@ except ImportError:
         st.markdown("---")
         st.markdown("[Inici](/)")
         st.markdown("[Anàlisi de factura](/Anàlisi_Factura)")
+        st.markdown("[Simulador de factura](/Simulador_Factura)")
         st.markdown("[Simulador Solar](/Simulador_Solar)")
         st.markdown("[Dashboard](/Dashboard)")
 
@@ -162,7 +163,7 @@ st.markdown("""
 st.markdown('<p class="portada-seccio">On vols <span>començar</span>?</p>', unsafe_allow_html=True)
 
 # Targetes (clicables, enllaços)
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.markdown("""
@@ -195,6 +196,21 @@ with col2:
     """, unsafe_allow_html=True)
 
 with col3:
+    st.markdown("""
+    <a href="/Simulador_Factura" class="portada-card-link">
+    <div class="portada-card">
+      <div class="portada-card-titol">Simulador de factura</div>
+      <div class="portada-card-desc">
+        Desglossa la factura i compara quant pagaries amb PVPC,
+        tarifa indexada o fixa. Com el Comparador CNMC.
+      </div>
+      <span class="portada-chip">Comparació</span>
+      <span class="portada-chip">Desglossament</span>
+    </div>
+    </a>
+    """, unsafe_allow_html=True)
+
+with col4:
     st.markdown("""
     <a href="/Dashboard" class="portada-card-link">
     <div class="portada-card">
