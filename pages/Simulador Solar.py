@@ -8,6 +8,7 @@ import streamlit as st
 import plotly.graph_objects as go
 from services.solar import solar_production_by_region
 from services.electricity_prices import electricity_price_by_region, get_live_price_by_region
+from services.electricity_companies import TARIFA_INFO, get_price_factor, get_tarifa_description
 try:
     from services.ui import inject_global_css, render_sidebar_nav
     inject_global_css()
@@ -22,6 +23,17 @@ st.markdown(
 )
 
 st.divider()
+
+with st.expander("Com influeix la companyia i la tarifa en el preu?"):
+    st.markdown("""
+    **Sí, la companyia i el tipus de tarifa influeixen molt:**
+    - **PVPC (tarifa regulada)**: Preu hora a hora segons el mercat. Sovint la més barata. Sense permanència.
+    - **Mercat lliure indexat**: Similar al PVPC, amb petits marges de la comercialitzadora.
+    - **Mercat lliure fix**: Preu constant. Previsibilitat, però sol ser un 10–20% més car que el PVPC.
+    - **Algunes ofertes del mercat lliure**: Poden ser fins a un 35% més cares que el PVPC.
+
+    *Font: CNMC, estudis comparatius. El preu de referència que mostrem prové del mercat (ESIOS/Red Eléctrica).*
+    """)
 
 # ---------------- INPUTS ----------------
 # Pre-omplir des de l'anàlisi de factura si hi ha dades
@@ -57,9 +69,16 @@ with st.container():
             ],
         )
 
-        preu_recomanat, msg_actualitzacio = get_live_price_by_region(region)
-        st.info(f"Preu de referència a {region}: **{preu_recomanat:.3f} €/kWh**" + (f" — {msg_actualitzacio}" if msg_actualitzacio else " (estimació)"))
-        st.caption("Des d'octubre 2025 el mercat té preus cada 15 minuts; aquí es mostra la mitjana horària de referència PVPC.")
+        preu_pvpc, msg_actualitzacio = get_live_price_by_region(region)
+        tarifa = st.selectbox(
+            "Tipus de tarifa / comercialitzadora",
+            list(TARIFA_INFO.keys()),
+            help="La companyia i el tipus de tarifa influeixen molt en el preu. PVPC és la tarifa regulada (sovint la més barata).",
+        )
+        factor = get_price_factor(tarifa)
+        preu_recomanat = preu_pvpc * factor
+        st.info(f"Preu estimat a {region}: **{preu_recomanat:.3f} €/kWh**" + (f" — {msg_actualitzacio}" if msg_actualitzacio else " (estimació)"))
+        st.caption(get_tarifa_description(tarifa))
 
     with col_roof:
         mida_teulada = st.slider("Superfície disponible (m²)", 10, 200, 50)
