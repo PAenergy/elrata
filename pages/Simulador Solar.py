@@ -6,6 +6,8 @@ if str(_root) not in sys.path:
 
 import streamlit as st
 import plotly.graph_objects as go
+import pandas as pd
+import numpy as np
 from services.solar import solar_production_by_region
 from services.electricity_prices import electricity_price_by_region, get_live_price_by_region
 from services.electricity_companies import TARIFA_INFO, get_price_factor, get_tarifa_description
@@ -172,40 +174,194 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 col1.metric("Producció anual estimada", f"{produccio_anual:.0f} kWh")
-col2.metric("Autoconsum real (%)", f"{percent_autoconsum:.1f}%")
+col2.metric("Autoconsum real", f"{percent_autoconsum:.1f}%")
 col3.metric("Estalvi anual", f"{estalvi_total:.0f} €")
+col4.metric("Retorn inversió", f"{roi_anys:.1f} anys")
 
-st.metric("Retorn inversió", f"{roi_anys:.1f} anys")
+col1b, col2b, col3b, col4b = st.columns(4)
 
+cost_factura_actual = consum_anual * preu_kwh
+percent_estalvi = (estalvi_total / cost_factura_actual * 100) if cost_factura_actual > 0 else 0
 co2_estalvi = produccio_anual * 0.25
-st.metric("CO₂ estalviat anual", f"{co2_estalvi:.0f} kg")
 
-# ---------------- GRÀFIC ----------------
+col1b.metric("Cost anual sense solar", f"{cost_factura_actual:.0f} €")
+col2b.metric("Estalvi anual (%)", f"{percent_estalvi:.1f}%")
+col3b.metric("CO₂ estalviat", f"{co2_estalvi:.0f} kg")
+col4b.metric("Cost instal·lació", f"{cost_total:.0f} €")
 
-st.markdown("### Comparativa de consum vs producció")
+# Estadístiques d'estalvi a futur
+st.markdown("**Estalvi projectat**")
+c1, c2, c3 = st.columns(3)
+c1.metric("En 1 any", f"{estalvi_total:.0f} €")
+c2.metric("En 5 anys", f"{estalvi_total * 5:.0f} €")
+c3.metric("En 10 anys", f"{estalvi_total * 10:.0f} €")
 
-fig = go.Figure()
+st.divider()
 
-fig.add_trace(
-    go.Bar(
-        x=["Consum anual", "Producció solar"],
-        y=[consum_anual, produccio_anual],
-        marker_color=["#f97316", "#22c55e"],
-    )
+# ---------------- ESTALVI PER MESOS ----------------
+
+MESOS = ["Gen", "Feb", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Des"]
+# Distribució mensual solar Espanya (% anual per mes)
+DIST_SOLAR = [0.04, 0.05, 0.07, 0.08, 0.10, 0.11, 0.12, 0.11, 0.09, 0.07, 0.05, 0.04]
+# Consum mensual típic (més calor/aire a estiu)
+DIST_CONSUM = [0.09, 0.08, 0.08, 0.08, 0.08, 0.08, 0.09, 0.09, 0.08, 0.08, 0.08, 0.09]
+
+produccio_mensual = [produccio_anual * d for d in DIST_SOLAR]
+consum_mensual = [consum_anual * d for d in DIST_CONSUM]
+
+estalvi_mensual = []
+for i in range(12):
+    prod_m = produccio_mensual[i]
+    autoc_m = autoconsum * DIST_SOLAR[i]
+    exc_m = max(prod_m - autoc_m, 0)
+    est = autoc_m * preu_kwh + exc_m * preu_excedent
+    estalvi_mensual.append(est)
+
+df_mensual = pd.DataFrame({
+    "Mes": MESOS,
+    "Producció (kWh)": produccio_mensual,
+    "Consum (kWh)": consum_mensual,
+    "Estalvi (€)": estalvi_mensual,
+})
+
+# ---------------- GRÀFIC 1: ESTALVI ELS PRÒXIMS 12 MESOS ----------------
+
+st.markdown("### Estalvi estimat els pròxims 12 mesos")
+
+fig1 = go.Figure()
+fig1.add_trace(go.Bar(
+    x=df_mensual["Mes"],
+    y=df_mensual["Estalvi (€)"],
+    name="Estalvi (€)",
+    marker_color="#22c55e",
+    text=[f"{v:.0f} €" for v in estalvi_mensual],
+    textposition="outside",
+))
+fig1.update_layout(
+    template="plotly_dark",
+    xaxis_title="Mes",
+    yaxis_title="Estalvi (€)",
+    showlegend=False,
+    margin=dict(t=40, b=60),
 )
+st.plotly_chart(fig1, use_container_width=True)
 
-fig.update_layout(template="plotly_dark")
+# ---------------- GRÀFIC 2: ESTALVI ACUMULAT EN ELS PRÒXIMS ANYS ----------------
 
-st.plotly_chart(fig, use_container_width=True)
+st.markdown("### Estalvi acumulat en els pròxims anys")
+
+anys_mostrar = min(25, max(15, int(roi_anys) + 5))
+anys = list(range(1, anys_mostrar + 1))
+estalvi_acumulat = [estalvi_total * a for a in anys]
+inversio_linea = [cost_total] * anys_mostrar
+
+fig2 = go.Figure()
+fig2.add_trace(go.Scatter(
+    x=anys,
+    y=estalvi_acumulat,
+    mode="lines+markers",
+    name="Estalvi acumulat",
+    line=dict(color="#22c55e", width=3),
+    fill="tozeroy",
+))
+fig2.add_trace(go.Scatter(
+    x=anys,
+    y=inversio_linea,
+    mode="lines",
+    name="Cost instal·lació",
+    line=dict(color="#f97316", width=2, dash="dash"),
+))
+fig2.update_layout(
+    template="plotly_dark",
+    xaxis_title="Anys",
+    yaxis_title="€",
+    legend=dict(orientation="h", yanchor="bottom", y=1.02),
+    margin=dict(t=60),
+)
+st.plotly_chart(fig2, use_container_width=True)
+
+st.caption("El punt que talla la línia de cost indica quan recuperes la inversió.")
+
+# ---------------- GRÀFIC 3: PRODUCCIÓ VS CONSUM MENSUAL ----------------
+
+st.markdown("### Producció solar vs consum mensual")
+
+fig3 = go.Figure()
+fig3.add_trace(go.Bar(
+    x=MESOS,
+    y=produccio_mensual,
+    name="Producció solar",
+    marker_color="#22c55e",
+))
+fig3.add_trace(go.Bar(
+    x=MESOS,
+    y=consum_mensual,
+    name="Consum",
+    marker_color="#64748b",
+))
+fig3.update_layout(
+    template="plotly_dark",
+    barmode="group",
+    xaxis_title="Mes",
+    yaxis_title="kWh",
+    legend=dict(orientation="h", yanchor="bottom", y=1.02),
+)
+st.plotly_chart(fig3, use_container_width=True)
+
+# ---------------- GRÀFIC 4: COMPARATIVA ANUAL ----------------
+
+st.markdown("### Resum anual: consum vs producció")
+
+fig4 = go.Figure()
+fig4.add_trace(go.Bar(
+    x=["Consum anual", "Producció solar", "Autoconsum"],
+    y=[consum_anual, produccio_anual, autoconsum],
+    marker_color=["#f97316", "#22c55e", "#4ade80"],
+    text=[f"{consum_anual:.0f} kWh", f"{produccio_anual:.0f} kWh", f"{autoconsum:.0f} kWh"],
+    textposition="outside",
+))
+fig4.update_layout(
+    template="plotly_dark",
+    xaxis_title="",
+    yaxis_title="kWh",
+    showlegend=False,
+)
+st.plotly_chart(fig4, use_container_width=True)
+
+# ---------------- GRÀFIC 5: PIE - BALANÇ ENERGÈTIC ----------------
+
+st.markdown("### Balanç energètic")
+
+grid_necessari = max(consum_anual - autoconsum, 0)
+labels_pie = ["Autoconsum solar", "Xarxa elèctrica", "Excedent venut"]
+values_pie = [autoconsum, grid_necessari, excedent]
+colors_pie = ["#22c55e", "#f97316", "#38bdf8"]
+
+fig5 = go.Figure(data=[go.Pie(
+    labels=labels_pie,
+    values=values_pie,
+    hole=0.4,
+    marker_colors=colors_pie,
+    textinfo="label+percent",
+)])
+fig5.update_layout(
+    template="plotly_dark",
+    showlegend=True,
+    legend=dict(orientation="h", yanchor="bottom"),
+    margin=dict(t=20, b=20),
+)
+st.plotly_chart(fig5, use_container_width=True)
+
+st.divider()
 
 if roi_anys < 7:
     st.success("Inversió molt interessant.")
 elif roi_anys < 12:
     st.info("Inversió raonable.")
 else:
-    st.warning("⚠ ROI llarg. Revisa subvencions.")
+    st.warning("ROI llarg. Revisa subvencions.")
 
 st.caption("Model d'autoconsum basat en simulacions residencials europees.")
