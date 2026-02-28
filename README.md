@@ -1,0 +1,39 @@
+# El Rata
+
+Plataforma per reduir despeses: anàlisi de factures elèctriques i recomanacions de plaques solars.
+
+---
+
+## Com executar
+
+1. Obre un terminal a la carpeta del projecte.
+
+2. Instal·la les dependències:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Executa l’aplicació:
+   ```bash
+   streamlit run Inici.py
+   ```
+
+4. S’obrirà el navegador amb la web. Si no, entra a: **http://localhost:8501**
+
+---
+
+## Nota (Windows)
+
+Per analitzar factures en PDF cal **Poppler**. Si no el tens:
+
+- Instal·la amb: `winget install poppler`
+- O descarrega’l des de: https://github.com/osber/poppler-windows/releases
+
+---
+
+## Estructura
+
+- **Inici.py** — Pàgina principal
+- **pages/Anàlisi Factura.py** — Puja una factura i extreu consum, potència i import
+- **pages/Simulador Solar.py** — Simula plaques solars i ROI
+- **pages/Dashboard.py** — Consum històric i prediccions
