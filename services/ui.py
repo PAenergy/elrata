@@ -1,6 +1,20 @@
 import streamlit as st
 
 
+def render_sidebar_nav():
+    """Mostra el menú de navegació al lateral."""
+    with st.sidebar:
+        st.title("El Rata")
+        st.markdown("---")
+        st.markdown("**Navegació**")
+        st.markdown("[Inici](/)" )
+        st.markdown("[Anàlisi de factura](/Anàlisi_Factura)")
+        st.markdown("[Simulador de factura](/Simulador_Factura)")
+        st.markdown("[Simulador Solar](/Simulador_Solar)")
+        st.markdown("[Dashboard](/Dashboard)")
+        st.markdown("---")
+
+
 def inject_global_css():
     """Aplica un estil fosc modern a tota l'app."""
     st.markdown(
@@ -213,5 +227,4 @@ input, textarea, select {
         """,
         unsafe_allow_html=True,
     )
-
 
