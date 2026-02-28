@@ -1,12 +1,10 @@
 # El Rata - Plataforma d'estalvi energètic
 # Instal·lació: pip install -r requirements.txt
 #
-# Nota: pdf2image requereix Poppler. A Windows:
-#   winget install poppler
-# O descarrega des de: https://github.com/osber/poppler-windows/releases
+# PyMuPDF per convertir PDF a imatges (no requereix Poppler, funciona a Streamlit Cloud)
 
 streamlit>=1.28.0
-pdf2image>=1.16.0
+pymupdf>=1.24.0
 Pillow>=10.0.0
 easyocr>=1.7.0
 numpy>=1.24.0
