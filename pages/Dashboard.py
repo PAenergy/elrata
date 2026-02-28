@@ -14,8 +14,17 @@ try:
 except ImportError:
     def predict_consumption(df):
         import pandas as pd
-        mean_val = df["consum_kwh"].mean() if "consum_kwh" in df.columns and len(df) > 0 else 0
-        return pd.DataFrame({"mes": [f"Futur_{i+1}" for i in range(6)], "prediccio_kwh": [mean_val] * 6})
+        if "consum_kwh" in df.columns and len(df) > 0:
+            mean_val = float(df["consum_kwh"].mean())
+        else:
+            mean_val = 0.0
+        return pd.DataFrame(
+            {
+                "mes": [f"Futur_{i + 1}" for i in range(12)],
+                "prediccio_kwh": [mean_val] * 12,
+            }
+        )
+
     def generate_recommendations(*args):
         return ["Puja les dades per obtenir recomanacions."]
 
@@ -92,6 +101,8 @@ if uploaded_file:
         markers=True,
         template="plotly_dark",
         color_discrete_sequence=["#22c55e"],
+        title="Predicció de consum els pròxims 12 mesos",
+        labels={"mes": "Mes", "prediccio_kwh": "Consum previst (kWh)"},
     )
 
     st.plotly_chart(fig2, use_container_width=True)
