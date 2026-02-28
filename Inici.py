@@ -1,6 +1,12 @@
 import streamlit as st
 from services.ui import inject_global_css
+import sys
+from pathlib import Path
 
+# Assegura que la carpeta del projecte és al path (Streamlit Cloud, etc.)
+_root = Path(__file__).resolve().parent
+if str(_root) not in sys.path:
+    sys.path.insert(0, str(_root))
 st.set_page_config(
     page_title="El Rata · Estalvi energètic",
     page_icon=None,
@@ -97,3 +103,4 @@ with col3:
         unsafe_allow_html=True,
     )
     st.page_link("pages/Dashboard.py", label="Veure dashboard")
+
