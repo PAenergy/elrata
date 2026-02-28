@@ -120,7 +120,7 @@ if uploaded_pdf:
             "Algunes dades no s'han pogut detectar. Revisa el text OCR i introdueix-les manualment al simulador."
         )
 
-    # Botó per anar al simulador solar amb dades pre-omplertes
+    # Botons per anar als simuladors amb dades pre-omplertes
     if consum_detectat:
         # Estimar consum anual: si el consum detectat sembla mensual (< 800 kWh), anualitzar
         consum_anual_estim = consum_detectat
@@ -139,10 +139,19 @@ if uploaded_pdf:
 
         st.divider()
 
-        if st.button("Veure recomanacions de plaques solars", type="primary"):
-            st.session_state.invoice_consum_anual = consum_anual_estim
-            st.session_state.invoice_preu_kwh = preu_estim
-            st.switch_page("pages/Simulador Solar.py")
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            if st.button("Simula la factura amb altres tarifes", type="primary"):
+                st.session_state.invoice_consum_anual = consum_detectat
+                st.session_state.invoice_preu_kwh = preu_estim
+                st.session_state.invoice_potencia = data.potencia_kw or 4.6
+                st.switch_page("pages/Simulador Factura.py")
+        with col_btn2:
+            if st.button("Veure recomanacions de plaques solars"):
+                st.session_state.invoice_consum_anual = consum_anual_estim
+                st.session_state.invoice_preu_kwh = preu_estim
+                st.session_state.invoice_potencia = data.potencia_kw or 4.6
+                st.switch_page("pages/Simulador Solar.py")
 
 else:
     st.info("Puja una factura en PDF per començar l'anàlisi.")
