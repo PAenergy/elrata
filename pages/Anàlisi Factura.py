@@ -10,10 +10,13 @@ import easyocr
 import numpy as np
 
 from services.invoice_parser import parse_invoice_text
-from services.ui import inject_global_css, render_sidebar_nav
 
-inject_global_css()
-render_sidebar_nav()
+try:
+    from services.ui import inject_global_css, render_sidebar_nav
+    inject_global_css()
+    render_sidebar_nav()
+except ImportError:
+    pass  # App corre sense estils personalitzats
 
 st.markdown(
     '<h1 class="app-page-title">Anàlisi de factura elèctrica</h1>'
