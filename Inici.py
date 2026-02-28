@@ -24,8 +24,6 @@ st.set_page_config(
 )
 
 inject_global_css()
-
-# Menú lateral
 render_sidebar_nav()
 
 # ---------------- HERO ----------------
@@ -57,7 +55,6 @@ st.markdown(
     '<h2 class="app-section-title">On vols <span>començar</span>?</h2>',
     unsafe_allow_html=True,
 )
-st.info("Utilitza el menú lateral (icona a dalt a l'esquerra) per accedir a cada secció.")
 
 col1, col2, col3 = st.columns(3)
 
