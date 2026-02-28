@@ -9,10 +9,12 @@ import pandas as pd
 import plotly.express as px
 from ai.prediction import predict_consumption
 from ai.advisor import generate_recommendations
-from services.ui import inject_global_css, render_sidebar_nav
-
-inject_global_css()
-render_sidebar_nav()
+try:
+    from services.ui import inject_global_css, render_sidebar_nav
+    inject_global_css()
+    render_sidebar_nav()
+except ImportError:
+    pass
 
 st.markdown(
     '<h1 class="app-page-title">Dashboard energètic</h1>'
