@@ -1,5 +1,3 @@
-import streamlit as st
-from services.ui import inject_global_css
 import sys
 from pathlib import Path
 
@@ -7,6 +5,15 @@ from pathlib import Path
 _root = Path(__file__).resolve().parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
+
+import streamlit as st
+
+try:
+    from services.ui import inject_global_css
+except ImportError:
+    def inject_global_css():
+        pass  # Fallback si services.ui no es troba
+
 st.set_page_config(
     page_title="El Rata · Estalvi energètic",
     page_icon=None,
@@ -64,7 +71,8 @@ with col1:
 """,
         unsafe_allow_html=True,
     )
-    st.page_link("pages/Anàlisi Factura.py", label="Obrir anàlisi de factura")
+    if st.button("Obrir anàlisi de factura", key="btn_analisi"):
+        st.switch_page("pages/Anàlisi Factura.py")
 
 with col2:
     st.markdown(
@@ -83,7 +91,8 @@ with col2:
 """,
         unsafe_allow_html=True,
     )
-    st.page_link("pages/Simulador Solar.py", label="Simular plaques solars")
+    if st.button("Simular plaques solars", key="btn_solar"):
+        st.switch_page("pages/Simulador Solar.py")
 
 with col3:
     st.markdown(
@@ -102,5 +111,5 @@ with col3:
 """,
         unsafe_allow_html=True,
     )
-    st.page_link("pages/Dashboard.py", label="Veure dashboard")
-
+    if st.button("Veure dashboard", key="btn_dashboard"):
+        st.switch_page("pages/Dashboard.py")
