@@ -9,18 +9,24 @@ if str(_root) not in sys.path:
 import streamlit as st
 
 try:
-    from services.ui import inject_global_css
+    from services.ui import inject_global_css, render_sidebar_nav
 except ImportError:
     def inject_global_css():
-        pass  # Fallback si services.ui no es troba
+        pass
+    def render_sidebar_nav():
+        pass
 
 st.set_page_config(
     page_title="El Rata · Estalvi energètic",
     page_icon=None,
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 inject_global_css()
+
+# Menú lateral
+render_sidebar_nav()
 
 # ---------------- HERO ----------------
 
