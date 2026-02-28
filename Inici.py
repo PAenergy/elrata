@@ -51,6 +51,7 @@ st.markdown(
     '<h2 class="app-section-title">On vols <span>començar</span>?</h2>',
     unsafe_allow_html=True,
 )
+st.info("Utilitza el menú lateral (icona a dalt a l'esquerra) per accedir a cada secció.")
 
 col1, col2, col3 = st.columns(3)
 
@@ -71,9 +72,6 @@ with col1:
 """,
         unsafe_allow_html=True,
     )
-    if st.button("Obrir anàlisi de factura", key="btn_analisi"):
-        st.switch_page("pages/Anàlisi Factura.py")
-
 with col2:
     st.markdown(
         """
@@ -91,9 +89,6 @@ with col2:
 """,
         unsafe_allow_html=True,
     )
-    if st.button("Simular plaques solars", key="btn_solar"):
-        st.switch_page("pages/Simulador Solar.py")
-
 with col3:
     st.markdown(
         """
@@ -111,5 +106,3 @@ with col3:
 """,
         unsafe_allow_html=True,
     )
-    if st.button("Veure dashboard", key="btn_dashboard"):
-        st.switch_page("pages/Dashboard.py")
