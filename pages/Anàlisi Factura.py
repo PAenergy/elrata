@@ -5,7 +5,7 @@ if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
 import streamlit as st
-from pdf2image import convert_from_bytes
+import fitz  # PyMuPDF - no requereix Poppler
 import easyocr
 import numpy as np
 
@@ -48,7 +48,15 @@ if uploaded_pdf:
     st.info("Convertint PDF a imatges...")
 
     try:
-        images = convert_from_bytes(uploaded_pdf.read())
+        pdf_bytes = uploaded_pdf.read()
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        images = []
+        for page_num in range(len(doc)):
+            page = doc.load_page(page_num)
+            pix = page.get_pixmap(dpi=150, alpha=False)
+            img_array = np.frombuffer(pix.samples, dtype=np.uint8).reshape(pix.height, pix.width, pix.n)
+            images.append(img_array)
+        doc.close()
     except Exception as e:
         st.error(f"Error al llegir el PDF: {e}")
         st.stop()
@@ -58,8 +66,8 @@ if uploaded_pdf:
 
     text_total = ""
 
-    for img in images:
-        img_array = np.array(img)
+    for img_array in images:
+        img_array = np.ascontiguousarray(img_array)
         results = reader.readtext(img_array)
         for (bbox, text, prob) in results:
             text_total += text + "\n"
