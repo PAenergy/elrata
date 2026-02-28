@@ -22,12 +22,13 @@ Plataforma per reduir despeses: anàlisi de factures elèctriques i recomanacion
 
 ---
 
-## Nota (Windows)
+## Preus en temps real (opcional)
 
-Per analitzar factures en PDF cal **Poppler**. Si no el tens:
+Per obtenir preus PVPC actualitzats des de Red Eléctrica:
 
-- Instal·la amb: `winget install poppler`
-- O descarrega’l des de: https://github.com/osber/poppler-windows/releases
+1. Sol·licita un token gratuït a `consultasios@ree.es` (tema: "Personal token request")
+2. Defineix la variable d'entorn `ESIOS_API_KEY` amb el token
+3. A Streamlit Cloud: Settings → Secrets → afegir `ESIOS_API_KEY`
 
 ---
 
