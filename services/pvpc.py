@@ -3,12 +3,19 @@ Preus elèctrics actualitzats des de Red Eléctrica (ESIOS).
 Des d'octubre 2025 el mercat és quarthorari (preus cada 15 min);
 l'API PVPC retorna valors horaris que fem servir com a referència.
 Font: https://api.esios.ree.es - Indicador 1001 (PVPC 2.0TD).
+
+Per preus en temps real: sol·licita token a consultasios@ree.es
+i defineix la variable d'entorn ESIOS_API_KEY.
 """
 from __future__ import annotations
 
 import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+
+# Cache senzill: (region, price, updated_str) per evitar crides excessives
+_CACHE: dict[str, tuple[float, str, datetime]] = {}
+_CACHE_TTL_MINUTES = 60
 
 # Geo IDs ESIOS: Península, Canàries, Balears, Ceuta, Melilla
 GEO_PENINSULA = 8741
@@ -37,10 +44,10 @@ REGION_TO_GEO: dict[str, int] = {
     "Canàries": GEO_CANARIAS,
 }
 
-# Fallback €/kWh si l'API falla (mitjana orientativa per zona)
-FALLBACK_PRICE_PENINSULA = 0.22
-FALLBACK_PRICE_CANARIAS = 0.19
-FALLBACK_PRICE_BALEARS = 0.25
+# Fallback €/kWh si l'API falla (mitjana 2024-2025, inclou impostos)
+FALLBACK_PRICE_PENINSULA = 0.21
+FALLBACK_PRICE_CANARIAS = 0.18
+FALLBACK_PRICE_BALEARS = 0.24
 
 
 def _fetch_esios(start: datetime, end: datetime, geo_id: int) -> Optional[list[dict]]:
@@ -114,9 +121,15 @@ def get_pvpc_price_eur_per_kwh(region: str) -> tuple[float, Optional[str]]:
     aquí es retorna la mitjana horària del dia en curs o de l'últim dia disponible
     perquè la web es pugui anar regulant sola.
     """
+    now = datetime.now(timezone(timedelta(hours=1)))
+    cache_key = region
+    if cache_key in _CACHE:
+        price, msg, cached_at = _CACHE[cache_key]
+        if (now - cached_at).total_seconds() < _CACHE_TTL_MINUTES * 60:
+            return price, msg
+
     geo_id = REGION_TO_GEO.get(region, GEO_PENINSULA)
     tz = timezone(timedelta(hours=1))
-    now = datetime.now(tz)
     # Demanem avui i ahir per si avui encara no hi ha dades
     start = (now - timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
     end = now
@@ -126,6 +139,7 @@ def get_pvpc_price_eur_per_kwh(region: str) -> tuple[float, Optional[str]]:
         price, n = _values_to_eur_per_kwh(values, geo_id)
         if n > 0 and price > 0:
             updated = now.strftime("%d/%m/%Y %H:%M")
+            _CACHE[cache_key] = (price, f"PVPC (actualitzat {updated})", now)
             return price, f"PVPC (actualitzat {updated})"
         # Si el preu surt 0, fem fallback
     # Fallback per zona
@@ -134,4 +148,3 @@ def get_pvpc_price_eur_per_kwh(region: str) -> tuple[float, Optional[str]]:
     if geo_id == GEO_BALEARS:
         return FALLBACK_PRICE_BALEARS, None
     return FALLBACK_PRICE_PENINSULA, None
-
