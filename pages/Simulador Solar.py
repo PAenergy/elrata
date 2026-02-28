@@ -8,10 +8,12 @@ import streamlit as st
 import plotly.graph_objects as go
 from services.solar import solar_production_by_region
 from services.electricity_prices import electricity_price_by_region, get_live_price_by_region
-from services.ui import inject_global_css, render_sidebar_nav
-
-inject_global_css()
-render_sidebar_nav()
+try:
+    from services.ui import inject_global_css, render_sidebar_nav
+    inject_global_css()
+    render_sidebar_nav()
+except ImportError:
+    pass
 
 st.markdown(
     '<h1 class="app-page-title">Simulador de plaques solars</h1>'
