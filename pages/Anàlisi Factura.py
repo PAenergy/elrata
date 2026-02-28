@@ -24,6 +24,24 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+# Factura de prova
+try:
+    from services.sample_invoice import generate_sample_invoice_pdf
+    pdf_bytes = generate_sample_invoice_pdf()
+    if pdf_bytes:
+        st.download_button(
+            label="Descarrega factura de prova (PDF)",
+            data=pdf_bytes,
+            file_name="factura_prova_elrata.pdf",
+            mime="application/pdf",
+            key="download_sample",
+        )
+        st.caption("Descarrega aquest PDF i puja'l a sota per provar l'anàlisi.")
+except ImportError:
+    pass
+
+st.divider()
+
 uploaded_pdf = st.file_uploader("Puja factura en PDF", type=["pdf"])
 
 if uploaded_pdf:
