@@ -147,9 +147,14 @@ except ImportError:
         st.markdown("[Simulador de factura](/Simulador_Factura)")
         st.markdown("[Simulador Solar](/Simulador_Solar)")
         st.markdown("[Dashboard](/Dashboard)")
+        st.markdown("---")
+        st.markdown("[FAQ](/FAQ)")
+        st.markdown("[Contacte](/Contacte)")
 
 # Hero
-st.markdown("""
+lang = st.session_state.get("lang", "ca")
+if lang == "ca":
+    hero_html = """
 <div class="portada-hero">
   <div class="portada-badge">Estalvi energètic amb IA</div>
   <h1 class="portada-titol">El Rata <span>t'ajuda a pagar menys llum</span></h1>
@@ -158,9 +163,23 @@ st.markdown("""
     adaptades a casa teva. Tot en minuts, sense fulls de càlcul.
   </p>
 </div>
-""", unsafe_allow_html=True)
+"""
+    section_html = '<p class="portada-seccio">On vols <span>començar</span>?</p>'
+else:
+    hero_html = """
+<div class="portada-hero">
+  <div class="portada-badge">Ahorro energético con IA</div>
+  <h1 class="portada-titol">El Rata <span>te ayuda a pagar menos luz</span></h1>
+  <p class="portada-subtitol">
+    Sube tu factura, entiende en qué estás gastando y simula unas placas solares
+    adaptadas a tu casa. Todo en minutos, sin hojas de cálculo.
+  </p>
+</div>
+"""
+    section_html = '<p class="portada-seccio">¿Por dónde quieres <span>empezar</span>?</p>'
 
-st.markdown('<p class="portada-seccio">On vols <span>començar</span>?</p>', unsafe_allow_html=True)
+st.markdown(hero_html, unsafe_allow_html=True)
+st.markdown(section_html, unsafe_allow_html=True)
 
 # Targetes (clicables, enllaços)
 col1, col2, col3, col4 = st.columns(4)
@@ -224,3 +243,18 @@ with col4:
     </div>
     </a>
     """, unsafe_allow_html=True)
+
+st.markdown("---")
+if lang == "ca":
+    st.markdown(
+        "### Servei professional d'assessorament energètic\n"
+        "Vols un **informe personalitzat** amb recomanacions concretes (canvi de tarifa, plaques, potència...)? "
+        "Demana-ho des del Simulador de factura, del Simulador Solar o a la pàgina de [Contacte](/Contacte)."
+    )
+else:
+    st.markdown(
+        "### Servicio profesional de asesoramiento energético\n"
+        "¿Quieres un **informe personalizado** con recomendaciones concretas (cambio de tarifa, placas, potencia...)? "
+        "Pídelo desde el Simulador de factura, el Simulador Solar o en la página de [Contacto](/Contacte)."
+    )
+st.markdown('[FAQ](/FAQ) · [Contacte](/Contacte)')
