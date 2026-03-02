@@ -18,9 +18,24 @@ try:
 except ImportError:
     pass  # App corre sense estils personalitzats
 
+# Idioma
+lang = st.session_state.get("lang", "ca")
+if lang == "ca":
+    title = "Anàlisi de factura elèctrica"
+    subtitle = (
+        "Puja la teva factura en PDF i deixa que l'IA n'extregui el consum, "
+        "la potència i l'import total."
+    )
+else:
+    title = "Análisis de factura eléctrica"
+    subtitle = (
+        "Sube tu factura en PDF y deja que la IA extraiga el consumo, "
+        "la potencia y el importe total."
+    )
+
 st.markdown(
-    '<h1 class="app-page-title">Anàlisi de factura elèctrica</h1>'
-    '<p class="app-page-subtitle">Puja la teva factura en PDF i deixa que l\'IA n\'extregui el consum, la potència i l\'import total.</p>',
+    f'<h1 class="app-page-title">{title}</h1>'
+    f'<p class="app-page-subtitle">{subtitle}</p>',
     unsafe_allow_html=True,
 )
 
@@ -139,7 +154,7 @@ if uploaded_pdf:
 
         st.divider()
 
-        col_btn1, col_btn2 = st.columns(2)
+        col_btn1, col_btn2, col_btn3 = st.columns(3)
         with col_btn1:
             if st.button("Simula la factura amb altres tarifes", type="primary"):
                 st.session_state.invoice_consum_anual = consum_detectat
@@ -152,6 +167,13 @@ if uploaded_pdf:
                 st.session_state.invoice_preu_kwh = preu_estim
                 st.session_state.invoice_potencia = data.potencia_kw or 4.6
                 st.switch_page("pages/Simulador Solar.py")
+        with col_btn3:
+            if st.button("Afegir al Dashboard"):
+                st.session_state.invoice_consum_anual = consum_anual_estim
+                st.session_state.invoice_preu_kwh = preu_estim
+                st.session_state.invoice_potencia = data.potencia_kw or 4.6
+                st.session_state.invoice_for_dashboard = True
+                st.switch_page("pages/Dashboard.py")
 
 else:
     st.info("Puja una factura en PDF per començar l'anàlisi.")
