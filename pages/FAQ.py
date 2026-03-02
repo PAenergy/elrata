@@ -14,9 +14,17 @@ try:
 except ImportError:
     pass
 
+lang = st.session_state.get("lang", "ca")
+if lang == "ca":
+    title = "Com funciona El Rata"
+    subtitle = "Respostes a les preguntes més freqüents."
+else:
+    title = "Cómo funciona El Rata"
+    subtitle = "Respuestas a las preguntas más frecuentes."
+
 st.markdown(
-    '<h1 class="app-page-title">Com funciona El Rata</h1>'
-    '<p class="app-page-subtitle">Respostes a les preguntes més freqüents.</p>',
+    f'<h1 class="app-page-title">{title}</h1>'
+    f'<p class="app-page-subtitle">{subtitle}</p>',
     unsafe_allow_html=True,
 )
 
@@ -68,4 +76,15 @@ st.markdown("### Bono social")
 st.markdown("""
 Si tens consum i potència baixos i compleixes requisits d'ingressos, pots optar al bono social. 
 Consulta els [requisits a la CNMC](https://www.cnmc.es/bono-social-electricidad).
+""")
+
+st.markdown("### Hi ha serveis de pagament?")
+st.markdown("""
+L'eina bàsica (anàlisi de factura, simuladors i dashboard) és gratuïta.
+
+Si ho desitges, pots sol·licitar:
+- **Revisió professional de la factura** (des del Simulador de factura)
+- **Estudi personalitzat de plaques solars** (des del Simulador Solar)
+
+Aquests serveis poden implicar un cost i es gestionen mitjançant contacte directe.
 """)
