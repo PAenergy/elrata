@@ -18,9 +18,22 @@ try:
 except ImportError:
     pass
 
+# Idioma
+lang = st.session_state.get("lang", "ca")
+if lang == "ca":
+    title = "Simulador de plaques solars"
+    subtitle = (
+        "Calcula producció, autoconsum, estalvi anual i anys de retorn abans d'invertir."
+    )
+else:
+    title = "Simulador de paneles solares"
+    subtitle = (
+        "Calcula producción, autoconsumo, ahorro anual y años de retorno antes de invertir."
+    )
+
 st.markdown(
-    '<h1 class="app-page-title">Simulador de plaques solars</h1>'
-    '<p class="app-page-subtitle">Calcula producció, autoconsum, estalvi anual i anys de retorn abans d\'invertir.</p>',
+    f'<h1 class="app-page-title">{title}</h1>'
+    f'<p class="app-page-subtitle">{subtitle}</p>',
     unsafe_allow_html=True,
 )
 
@@ -365,3 +378,57 @@ else:
     st.warning("ROI llarg. Revisa subvencions.")
 
 st.caption("Model d'autoconsum basat en simulacions residencials europees.")
+
+# Bloc comercial: estudi personalitzat de plaques
+st.markdown("---")
+if lang == "ca":
+    st.markdown(
+        "### Vols un estudi personalitzat de plaques?\n"
+        "Si vols anar més enllà del simulador i obtenir un **estudi detallat per casa teva** "
+        "(pressupost orientatiu, potència òptima, retorn amb subvencions, etc.), "
+        "deixa'ns les teves dades i ens posarem en contacte amb tu."
+    )
+else:
+    st.markdown(
+        "### ¿Quieres un estudio personalizado de placas?\n"
+        "Si quieres ir más allá del simulador y obtener un **estudio detallado para tu vivienda** "
+        "(presupuesto orientativo, potencia óptima, retorno con subvenciones, etc.), "
+        "déjanos tus datos y contactaremos contigo."
+    )
+
+with st.form("lead_solar_form"):
+    nom_solar = st.text_input("Nom / Nombre")
+    email_solar = st.text_input("Email de contacte")
+    info_solar = st.text_area(
+        "Explica'ns una mica el teu cas / Cuéntanos tu caso",
+        placeholder="Pis o casa? Metres de teulada? Horaris d'ús...? / ¿Piso o casa? ¿Metros de tejado? ¿Horarios de uso...?",
+    )
+    accept_solar = st.checkbox(
+        "Accepto que es contacti amb mi per oferir aquest servei (servei potencialment de pagament).",
+        value=True,
+    )
+    enviat_solar = st.form_submit_button("Vull un estudi personalitzat")
+
+if 'lead_solar_enviat' not in st.session_state:
+    st.session_state.lead_solar_enviat = False
+
+if enviat_solar:
+    if email_solar.strip() and accept_solar:
+        st.session_state.lead_solar_enviat = True
+        if lang == "ca":
+            st.success("Gràcies! Hem registrat el teu interès per un estudi personalitzat.")
+            st.info(
+                "*Nota: En aquesta versió, el formulari no envia correus automàticament. "
+                "Caldrà contactar manualment amb els interessats.*"
+            )
+        else:
+            st.success("¡Gracias! Hemos registrado tu interés por un estudio personalizado.")
+            st.info(
+                "*Nota: En esta versión, el formulario no envía correos automáticamente. "
+                "Habrá que contactar manualmente con los interesados.*"
+            )
+    else:
+        if lang == "ca":
+            st.warning("Cal indicar com a mínim un email de contacte i acceptar el contacte.")
+        else:
+            st.warning("Es necesario indicar al menos un email de contacto y aceptar el contacto.")
