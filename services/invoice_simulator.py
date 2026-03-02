@@ -126,6 +126,48 @@ def comparar_tarifes(
     return resultats
 
 
+def simular_factura_discriminacio(
+    consum_kwh: float,
+    potencia_kw: float,
+    dies: int,
+    preu_punta: float,
+    preu_llano: float,
+    preu_valle: float,
+    pct_punta: float = 0.25,
+    pct_llano: float = 0.35,
+    pct_valle: float = 0.40,
+) -> DesglosFactura:
+    """
+    Simula factura amb discriminació horària (2.0TD).
+    pct_*: fracció del consum a cada període (han de sumar 1.0).
+    """
+    consum_punta = consum_kwh * pct_punta
+    consum_llano = consum_kwh * pct_llano
+    consum_valle = consum_kwh * pct_valle
+    terme_energia = consum_punta * preu_punta + consum_llano * preu_llano + consum_valle * preu_valle
+    terme_potencia = potencia_kw * dies * PEAJE_POTENCIA_EUR_KW_DIA
+    alquiler = dies * ALQUILER_COMPTADOR_EUR_DIA
+    base_imposable = terme_energia + terme_potencia + alquiler
+    impost_elec = base_imposable * IMPOST_ELECTRICITAT
+    base_amb_impost = base_imposable + impost_elec
+    iva = base_amb_impost * IVA_DOMESTIC
+    total = base_amb_impost + iva
+    preu_efectiu = total / consum_kwh if consum_kwh > 0 else 0
+    return DesglosFactura(
+        terme_energia=terme_energia,
+        terme_potencia=terme_potencia,
+        alquiler_comptador=alquiler,
+        base_imposable=base_imposable,
+        impost_electricitat=impost_elec,
+        iva=iva,
+        total=total,
+        consum_kwh=consum_kwh,
+        potencia_kw=potencia_kw,
+        dies=dies,
+        preu_kwh_efectiu=preu_efectiu,
+    )
+
+
 def estimar_estalvi_canvi_tarifa(
     consum_anual_kwh: float,
     potencia_kw: float,
