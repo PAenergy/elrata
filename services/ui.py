@@ -2,17 +2,46 @@ import streamlit as st
 
 
 def render_sidebar_nav():
-    """Mostra el menú de navegació al lateral."""
+    """Mostra el menú de navegació al lateral, amb selecció d'idioma."""
     with st.sidebar:
+        # Selector d'idioma (Català / Castellano)
+        current_lang = st.session_state.get("lang", "ca")
+        lang_label = "Català" if current_lang == "ca" else "Castellano"
+        selected = st.selectbox(
+            "Idioma / Idioma",
+            ["Català", "Castellano"],
+            index=0 if lang_label == "Català" else 1,
+            key="lang_selector",
+        )
+        st.session_state["lang"] = "ca" if selected == "Català" else "es"
+        lang = st.session_state["lang"]
+
         st.title("El Rata")
         st.markdown("---")
-        st.markdown("**Navegació**")
-        st.markdown("[Inici](/)" )
-        st.markdown("[Anàlisi de factura](/Anàlisi_Factura)")
-        st.markdown("[Simulador de factura](/Simulador_Factura)")
-        st.markdown("[Simulador Solar](/Simulador_Solar)")
-        st.markdown("[Dashboard](/Dashboard)")
-        st.markdown("---")
+
+        # Navegació principal
+        if lang == "ca":
+            st.markdown("**Navegació**")
+            st.markdown("[Inici](/)")
+            st.markdown("[Anàlisi de factura](/Anàlisi_Factura)")
+            st.markdown("[Simulador de factura](/Simulador_Factura)")
+            st.markdown("[Simulador Solar](/Simulador_Solar)")
+            st.markdown("[Dashboard](/Dashboard)")
+            st.markdown("---")
+            st.markdown("**Més**")
+            st.markdown("[FAQ](/FAQ)")
+            st.markdown("[Contacte](/Contacte)")
+        else:
+            st.markdown("**Navegación**")
+            st.markdown("[Inicio](/)")
+            st.markdown("[Análisis de factura](/Anàlisi_Factura)")
+            st.markdown("[Simulador de factura](/Simulador_Factura)")
+            st.markdown("[Simulador Solar](/Simulador_Solar)")
+            st.markdown("[Cuadro de mando](/Dashboard)")
+            st.markdown("---")
+            st.markdown("**Más**")
+            st.markdown("[Preguntas frecuentes](/FAQ)")
+            st.markdown("[Contacto](/Contacte)")
 
 
 def inject_global_css():
